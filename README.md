@@ -17,6 +17,7 @@
 14. [Update and Upsert Operations](#14-update-and-upsert-operations)
 15. [Relationship Joins, Reverse and Direct Relationships](#15-relationship-joins-reverse-and-direct-relationships)
 16. [INNER JOIN and LEFT JOIN Queries](#16-inner-join-and-left-join-queries)
+17. [Django ORM এবং Queries - সম্পূর্ণ গাইড]
 
 ---
 
@@ -3096,3 +3097,4 @@ Django ORM databases এর সাথে interact করার একটি শ�
 ---
 
 **Django Developers দের জন্য ❤️ সহকারে তৈরি**
+
