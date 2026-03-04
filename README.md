@@ -1,42 +1,41 @@
-# Django ORM and Queries - Complete Guide
+# Django ORM এবং Queries - সম্পূর্ণ গাইড
 
-## Table of Contents
-1. [ORM and Query Data Fetching Introduction](#1-orm-and-query-data-fetching-introduction)
-2. [Different Ways to Select All Records](#2-different-ways-to-select-all-records)
-3. [Different Ways to Select Single Record](#3-different-ways-to-select-single-record)
-4. [First and Last Record Query](#4-first-and-last-record-query)
-5. [Filtering, Excluding, Sorting, Limiting, Range and Count](#5-filtering-excluding-sorting-limiting-range-and-count)
+## সূচিপত্র
+1. [ORM এবং Query Data Fetching পরিচিতি](#1-orm-এবং-query-data-fetching-পরিচিতি)
+2. [সমস্ত রেকর্ড সিলেক্ট করার বিভিন্ন উপায়](#2-সমস্ত-রেকর্ড-সিলেক্ট-করার-বিভিন্ন-উপায়)
+3. [একক রেকর্ড সিলেক্ট করার বিভিন্ন উপায়](#3-একক-রেকর্ড-সিলেক্ট-করার-বিভিন্ন-উপায়)
+4. [প্রথম এবং শেষ রেকর্ড কুয়েরি](#4-প্রথম-এবং-শেষ-রেকর্ড-কুয়েরি)
+5. [ফিল্টারিং, বাদ দেওয়া, সর্টিং, লিমিটিং, রেঞ্জ এবং কাউন্ট](#5-ফিল্টারিং-বাদ-দেওয়া-সর্টিং-লিমিটিং-রেঞ্জ-এবং-কাউন্ট)
 6. [Query Method Chaining](#6-query-method-chaining)
-7. [Raw SQL Queries](#7-raw-sql-queries)
+7. [সরাসরি Raw SQL Queries](#7-সরাসরি-raw-sql-queries)
 8. [Query Debugging](#8-query-debugging)
 9. [Aggregation Operator Queries](#9-aggregation-operator-queries)
 10. [Comparison Operator Queries](#10-comparison-operator-queries)
 11. [String Operator Queries](#11-string-operator-queries)
-12. [Range and Membership Operator Queries](#12-range-and-membership-operator-queries)
-13. [Insert and Delete Operations](#13-insert-and-delete-operations)
-14. [Update and Upsert Operations](#14-update-and-upsert-operations)
-15. [Relationship Joins, Reverse and Direct Relationships](#15-relationship-joins-reverse-and-direct-relationships)
-16. [INNER JOIN and LEFT JOIN Queries](#16-inner-join-and-left-join-queries)
-17. [Django ORM এবং Queries - সম্পূর্ণ গাইড]
+12. [Range এবং Membership Operator Queries](#12-range-এবং-membership-operator-queries)
+13. [Insert এবং Delete Operations](#13-insert-এবং-delete-operations)
+14. [Update এবং Upsert Operations](#14-update-এবং-upsert-operations)
+15. [Relationship Joins, Reverse এবং Direct Relationships](#15-relationship-joins-reverse-এবং-direct-relationships)
+16. [INNER JOIN এবং LEFT JOIN Queries](#16-inner-join-এবং-left-join-queries)
 
 ---
 
-## 1. ORM and Query Data Fetching Introduction
+## 1. ORM এবং Query Data Fetching পরিচিতি
 
-Django ORM (Object-Relational Mapping) provides a powerful and intuitive way to interact with databases using Python code instead of raw SQL. It translates Python objects into database tables and vice versa.
+Django ORM (Object-Relational Mapping) একটি শক্তিশালী এবং সহজ পদ্ধতি যা আপনাকে raw SQL এর পরিবর্তে Python code ব্যবহার করে ডাটাবেসের সাথে কাজ করতে দেয়। এটি Python objects কে database tables এ রূপান্তরিত করে এবং এর বিপরীতে।
 
-### What is ORM?
-- **ORM** maps database tables to Python classes
-- Each model class represents a database table
-- Each instance of the model represents a row in the table
-- Model attributes represent table columns
+### ORM কি?
+- **ORM** database tables কে Python classes এ map করে
+- প্রতিটি model class একটি database table প্রতিনিধিত্ব করে
+- model এর প্রতিটি instance table এর একটি row প্রতিনিধিত্ব করে
+- Model attributes table এর columns প্রতিনিধিত্ব করে
 
-### Basic Query Concepts
-- **QuerySet**: A collection of database queries
-- **Lazy Evaluation**: Queries are not executed until needed
-- **Caching**: QuerySets cache their results
+### মৌলিক Query ধারণা
+- **QuerySet**: Database queries এর একটি সংগ্রহ
+- **Lazy Evaluation**: Queries প্রয়োজন না হওয়া পর্যন্ত execute হয় না
+- **Caching**: QuerySets তাদের results cache করে
 
-### Example Models
+### উদাহরণ Models
 ```python
 from django.db import models
 
@@ -66,44 +65,44 @@ class Product(models.Model):
 
 ---
 
-## 2. Different Ways to Select All Records
+## 2. সমস্ত রেকর্ড সিলেক্ট করার বিভিন্ন উপায়
 
-### Method 1: Using `.all()`
+### পদ্ধতি ১: `.all()` ব্যবহার করে
 ```python
 def home(request):
-    # Get all records as QuerySet
+    # সমস্ত রেকর্ড QuerySet হিসেবে পাওয়া
     customers = Customer.objects.all()
     return JsonResponse({'data': list(customers.values())})
 ```
 
-### Method 2: Using `.all().values()`
+### পদ্ধতি ২: `.all().values()` ব্যবহার করে
 ```python
 def home(request):
-    # Get all records with specific fields
+    # নির্দিষ্ট ফিল্ড সহ সমস্ত রেকর্ড পাওয়া
     result = Customer.objects.all().values('id', 'name', 'mobile')
     return JsonResponse({'data': list(result)})
 ```
 
-### Method 3: Using `.all().values_list()`
+### পদ্ধতি ৩: `.all().values_list()` ব্যবহার করে
 ```python
 def home(request):
-    # Get all records as tuples
+    # সমস্ত রেকর্ড tuples হিসেবে পাওয়া
     result = Customer.objects.all().values_list('id', 'name', 'mobile')
     return JsonResponse({'data': list(result)})
 ```
 
-### Method 4: Using `.filter()` without conditions
+### পদ্ধতি ৪: শর্ত ছাড়া `.filter()` ব্যবহার করে
 ```python
 def home(request):
-    # Get all records using filter
+    # filter ব্যবহার করে সমস্ত রেকর্ড পাওয়া
     result = Customer.objects.filter().values()
     return JsonResponse({'data': list(result)})
 ```
 
-### Method 5: Using iteration
+### পদ্ধতি ৫: Iteration ব্যবহার করে
 ```python
 def home(request):
-    # Get all records and iterate
+    # সমস্ত রেকর্ড পেয়ে iterate করা
     customers = Customer.objects.all()
     data = [{'id': c.id, 'name': c.name, 'mobile': c.mobile} for c in customers]
     return JsonResponse({'data': data})
@@ -111,31 +110,31 @@ def home(request):
 
 ---
 
-## 3. Different Ways to Select Single Record
+## 3. একক রেকর্ড সিলেক্ট করার বিভিন্ন উপায়
 
-### Method 1: Using `.get()` with ID
+### পদ্ধতি ১: ID দিয়ে `.get()` ব্যবহার করে
 ```python
 def home(request):
-    # Get single record by ID (raises exception if not found)
+    # ID দিয়ে একটি রেকর্ড পাওয়া (না পেলে exception raise করে)
     result = Customer.objects.get(id=1)
     return JsonResponse(model_to_dict(result))
 ```
 
-### Method 2: Using `.filter().first()`
+### পদ্ধতি ২: `.filter().first()` ব্যবহার করে
 ```python
 def home(request):
-    # Get first matching record (returns None if not found)
+    # প্রথম matching রেকর্ড পাওয়া (না পেলে None return করে)
     customer = Customer.objects.filter(id=1).first()
     if customer:
         return JsonResponse({'id': customer.id, 'name': customer.name})
     return JsonResponse({'error': 'Not found'})
 ```
 
-### Method 3: Using `.get()` with conditions
+### পদ্ধতি ৩: শর্ত সহ `.get()` ব্যবহার করে
 ```python
 def home(request):
     try:
-        # Get single record with multiple conditions
+        # একাধিক শর্ত দিয়ে একটি রেকর্ড পাওয়া
         customer = Customer.objects.get(name='John', mobile='1234567890')
         return JsonResponse(model_to_dict(customer))
     except Customer.DoesNotExist:
@@ -144,10 +143,10 @@ def home(request):
         return JsonResponse({'error': 'Multiple customers found'})
 ```
 
-### Method 4: Using `.filter()` with slicing
+### পদ্ধতি ৪: Slicing সহ `.filter()` ব্যবহার করে
 ```python
 def home(request):
-    # Get first record using slicing
+    # Slicing ব্যবহার করে প্রথম রেকর্ড পাওয়া
     customer = Customer.objects.filter(name='John')[0:1].first()
     if customer:
         return JsonResponse({'id': customer.id, 'name': customer.name})
@@ -156,135 +155,135 @@ def home(request):
 
 ---
 
-## 4. First and Last Record Query
+## 4. প্রথম এবং শেষ রেকর্ড কুয়েরি
 
-### Get First Record
+### প্রথম রেকর্ড পাওয়া
 ```python
 def home(request):
-    # Get the first record from the table
+    # Table থেকে প্রথম রেকর্ড পাওয়া
     customer = Customer.objects.first()
     if customer:
         return JsonResponse({'id': customer.id, 'name': customer.name})
     return JsonResponse({'error': 'No records found'})
 ```
 
-### Get First Record with Ordering
+### Ordering সহ প্রথম রেকর্ড পাওয়া
 ```python
 def home(request):
-    # Get first record ordered by name
+    # নাম অনুযায়ী সাজিয়ে প্রথম রেকর্ড পাওয়া
     customer = Customer.objects.order_by('name').first()
     return JsonResponse({'id': customer.id, 'name': customer.name})
 ```
 
-### Get Last Record
+### শেষ রেকর্ড পাওয়া
 ```python
 def home(request):
-    # Get the last record from the table
+    # Table থেকে শেষ রেকর্ড পাওয়া
     customer = Customer.objects.last()
     if customer:
         return JsonResponse({'id': customer.id, 'name': customer.name})
     return JsonResponse({'error': 'No records found'})
 ```
 
-### Get Last Record with Ordering
+### Ordering সহ শেষ রেকর্ড পাওয়া
 ```python
 def home(request):
-    # Get last record ordered by name
+    # নাম অনুযায়ী সাজিয়ে শেষ রেকর্ড পাওয়া
     customer = Customer.objects.order_by('name').last()
     return JsonResponse({'id': customer.id, 'name': customer.name})
 ```
 
-### Get Latest Record by Date
+### তারিখ অনুযায়ী সর্বশেষ রেকর্ড পাওয়া
 ```python
 def home(request):
-    # Get latest record by created_at field
+    # created_at field অনুযায়ী সর্বশেষ রেকর্ড পাওয়া
     customer = Customer.objects.latest('created_at')
     return JsonResponse({'id': customer.id, 'name': customer.name})
 ```
 
-### Get Earliest Record by Date
+### তারিখ অনুযায়ী সবচেয়ে পুরাতন রেকর্ড পাওয়া
 ```python
 def home(request):
-    # Get earliest record by created_at field
+    # created_at field অনুযায়ী সবচেয়ে পুরাতন রেকর্ড পাওয়া
     customer = Customer.objects.earliest('created_at')
     return JsonResponse({'id': customer.id, 'name': customer.name})
 ```
 
 ---
 
-## 5. Filtering, Excluding, Sorting, Limiting, Range and Count
+## 5. ফিল্টারিং, বাদ দেওয়া, সর্টিং, লিমিটিং, রেঞ্জ এবং কাউন্ট
 
-### Filtering Records
+### রেকর্ড ফিল্টার করা
 ```python
 def home(request):
-    # Filter records with case-insensitive search
+    # Case-insensitive search করে রেকর্ড ফিল্টার করা
     customer = Customer.objects.filter(name__icontains='john').values()
     return JsonResponse({'data': list(customer)})
 ```
 
 ```python
 def home(request):
-    # Filter records with case-sensitive search
+    # Case-sensitive search করে রেকর্ড ফিল্টার করা
     customer = Customer.objects.filter(name__contains='john').values()
     return JsonResponse({'data': list(customer)})
 ```
 
-### Excluding Records
+### রেকর্ড বাদ দেওয়া
 ```python
 def home(request):
-    # Exclude records that match condition
+    # শর্ত match করে এমন রেকর্ড বাদ দেওয়া
     customer = Customer.objects.exclude(name__icontains='john').values()
     return JsonResponse({'data': list(customer)})
 ```
 
-### Sorting (Ordering)
+### সর্টিং (Ordering)
 ```python
 def home(request):
-    # Sort in ascending order
+    # আরোহী ক্রমে সাজানো
     customer = Customer.objects.all().order_by('name').values()
     return JsonResponse({'data': list(customer)})
 ```
 
 ```python
 def home(request):
-    # Sort in descending order
+    # অবরোহী ক্রমে সাজানো
     customer = Customer.objects.all().order_by('-name').values()
     return JsonResponse({'data': list(customer)})
 ```
 
 ```python
 def home(request):
-    # Multiple column sorting
+    # একাধিক column অনুযায়ী সাজানো
     customer = Customer.objects.all().order_by('name', '-created_at').values()
     return JsonResponse({'data': list(customer)})
 ```
 
-### Limiting Records (Slicing)
+### রেকর্ড লিমিট করা (Slicing)
 ```python
 def home(request):
-    # Get first 5 records
+    # প্রথম ৫টি রেকর্ড পাওয়া
     customer = Customer.objects.all()[0:5].values()
     return JsonResponse({'data': list(customer)})
 ```
 
 ```python
 def home(request):
-    # Get records from index 3 to 5
+    # Index ৩ থেকে ৫ পর্যন্ত রেকর্ড পাওয়া
     customer = Customer.objects.all()[3:5].values()
     return JsonResponse({'data': list(customer)})
 ```
 
-### Counting Records
+### রেকর্ড গণনা করা
 ```python
 def home(request):
-    # Count total records
+    # মোট রেকর্ড গণনা করা
     customer = Customer.objects.count()
     return JsonResponse({'data': customer})
 ```
 
 ```python
 def home(request):
-    # Count filtered records
+    # ফিল্টার করা রেকর্ড গণনা করা
     count = Customer.objects.filter(name__icontains='john').count()
     return JsonResponse({'count': count})
 ```
@@ -293,12 +292,12 @@ def home(request):
 
 ## 6. Query Method Chaining
 
-Method chaining allows you to combine multiple QuerySet methods to create complex queries.
+Method chaining আপনাকে একাধিক QuerySet methods একসাথে ব্যবহার করে জটিল queries তৈরি করতে দেয়।
 
-### Basic Method Chaining
+### মৌলিক Method Chaining
 ```python
 def home(request):
-    # Chain filter, order_by, and values
+    # Filter, order_by, এবং values chain করা
     customer = Customer.objects.filter(
         name__icontains='john'
     ).order_by('-created_at').values()
@@ -306,10 +305,10 @@ def home(request):
     return JsonResponse({'data': list(customer)})
 ```
 
-### Complex Method Chaining
+### জটিল Method Chaining
 ```python
 def home(request):
-    # Multiple filters, exclude, order_by, and limit
+    # একাধিক filters, exclude, order_by, এবং limit
     products = Product.objects.filter(
         price__gte=100
     ).exclude(
@@ -319,12 +318,12 @@ def home(request):
     return JsonResponse({'data': list(products)})
 ```
 
-### Method Chaining with Aggregation
+### Aggregation সহ Method Chaining
 ```python
 from django.db.models import Count, Avg
 
 def home(request):
-    # Chain filter with aggregation
+    # Filter এর সাথে aggregation chain করা
     result = Product.objects.filter(
         price__gt=100
     ).values('category').annotate(
@@ -335,12 +334,12 @@ def home(request):
     return JsonResponse({'data': list(result)})
 ```
 
-### Method Chaining with Q Objects
+### Q Objects সহ Method Chaining
 ```python
 from django.db.models import Q
 
 def home(request):
-    # Complex filtering with method chaining
+    # Method chaining এর সাথে জটিল filtering
     products = Product.objects.filter(
         Q(price__lt=500) | Q(name__icontains='laptop')
     ).exclude(
@@ -352,25 +351,25 @@ def home(request):
 
 ---
 
-## 7. Raw SQL Queries
+## 7. সরাসরি Raw SQL Queries
 
-Sometimes you need to execute raw SQL queries for complex operations.
+কখনও কখনও জটিল operations এর জন্য আপনাকে raw SQL queries execute করতে হতে পারে।
 
-### Method 1: Using `.raw()`
+### পদ্ধতি ১: `.raw()` ব্যবহার করে
 ```python
 def home(request):
-    # Execute raw SQL query
+    # Raw SQL query execute করা
     customers = Customer.objects.raw('SELECT * FROM myapp_customer WHERE name LIKE %s', ['%john%'])
     data = [{'id': c.id, 'name': c.name, 'mobile': c.mobile} for c in customers]
     return JsonResponse({'data': data})
 ```
 
-### Method 2: Using `connection.cursor()`
+### পদ্ধতি ২: `connection.cursor()` ব্যবহার করে
 ```python
 from django.db import connection
 
 def home(request):
-    # Execute raw SQL with cursor
+    # Cursor দিয়ে raw SQL execute করা
     with connection.cursor() as cursor:
         cursor.execute("SELECT id, name, mobile FROM myapp_customer WHERE name LIKE %s", ['%john%'])
         columns = [col[0] for col in cursor.description]
@@ -380,10 +379,10 @@ def home(request):
     return JsonResponse({'data': data})
 ```
 
-### Method 3: Complex Raw Query
+### পদ্ধতি ৩: জটিল Raw Query
 ```python
 def home(request):
-    # Complex JOIN query
+    # জটিল JOIN query
     with connection.cursor() as cursor:
         cursor.execute("""
             SELECT p.id, p.name, p.price, c.name as category_name
@@ -400,10 +399,10 @@ def home(request):
     return JsonResponse({'data': data})
 ```
 
-### Method 4: Using `.extra()`
+### পদ্ধতি ৪: `.extra()` ব্যবহার করে
 ```python
 def home(request):
-    # Add custom SQL to QuerySet
+    # QuerySet এ custom SQL যোগ করা
     products = Product.objects.extra(
         select={'price_with_tax': 'price * 1.15'},
         where=['price > %s'],
@@ -418,22 +417,22 @@ def home(request):
 
 ## 8. Query Debugging
 
-### Method 1: Print SQL Query
+### পদ্ধতি ১: SQL Query Print করা
 ```python
 def home(request):
-    # Get QuerySet
+    # QuerySet পাওয়া
     queryset = Customer.objects.filter(name__icontains='john')
     
-    # Print the SQL query
+    # SQL query print করা
     query = str(queryset.query)
     print(query)
     
-    # Execute and get results
+    # Execute করে results পাওয়া
     data = list(queryset.values())
     return JsonResponse({'query': query, 'data': data})
 ```
 
-### Method 2: Using Django Debug Toolbar
+### পদ্ধতি ২: Django Debug Toolbar ব্যবহার করা
 ```python
 # Install: pip install django-debug-toolbar
 
@@ -451,7 +450,7 @@ MIDDLEWARE = [
 INTERNAL_IPS = ['127.0.0.1']
 ```
 
-### Method 3: Enable SQL Logging
+### পদ্ধতি ৩: SQL Logging Enable করা
 ```python
 # settings.py
 LOGGING = {
@@ -471,18 +470,18 @@ LOGGING = {
 }
 ```
 
-### Method 4: Using connection.queries
+### পদ্ধতি ৪: connection.queries ব্যবহার করা
 ```python
 from django.db import connection, reset_queries
 
 def home(request):
-    reset_queries()  # Clear previous queries
+    reset_queries()  # পূর্ববর্তী queries clear করা
     
-    # Execute queries
+    # Queries execute করা
     customers = Customer.objects.filter(name__icontains='john').values()
     products = Product.objects.filter(price__gt=100).values()
     
-    # Get all executed queries
+    # সব executed queries পাওয়া
     queries = connection.queries
     
     return JsonResponse({
@@ -495,13 +494,13 @@ def home(request):
     })
 ```
 
-### Method 5: Explain Query Plan
+### পদ্ধতি ৫: Query Execution Plan দেখা
 ```python
 def home(request):
-    # Get query execution plan
+    # Query execution plan পাওয়া
     queryset = Product.objects.filter(price__gt=100).order_by('-price')
     
-    # For PostgreSQL
+    # PostgreSQL এর জন্য
     explain = queryset.explain(verbose=True, analyze=True)
     
     return JsonResponse({'explain': explain})
@@ -511,64 +510,64 @@ def home(request):
 
 ## 9. Aggregation Operator Queries
 
-Aggregation functions perform calculations on a set of values and return a single value.
+Aggregation functions একাধিক values এর উপর calculation করে একটি single value return করে।
 
-### Average (Avg)
+### গড় (Avg)
 ```python
 from django.db.models import Avg
 
 def home(request):
-    # Calculate average price
+    # গড় মূল্য হিসাব করা
     product = Product.objects.aggregate(Avg('price'))
     return HttpResponse(product['price__avg'])
 ```
 
-### Minimum (Min)
+### সর্বনিম্ন (Min)
 ```python
 from django.db.models import Min
 
 def home(request):
-    # Get minimum price
+    # সর্বনিম্ন মূল্য পাওয়া
     product = Product.objects.aggregate(Min('price'))
     return HttpResponse(product['price__min'])
 ```
 
-### Maximum (Max)
+### সর্বোচ্চ (Max)
 ```python
 from django.db.models import Max
 
 def home(request):
-    # Get maximum price
+    # সর্বোচ্চ মূল্য পাওয়া
     product = Product.objects.aggregate(Max('price'))
     return HttpResponse(product['price__max'])
 ```
 
-### Sum
+### যোগফল (Sum)
 ```python
 from django.db.models import Sum
 
 def home(request):
-    # Calculate sum of all prices
+    # সব মূল্যের যোগফল হিসাব করা
     product = Product.objects.aggregate(Sum('price'))
     return HttpResponse(product['price__sum'])
 ```
 
-### Count
+### গণনা (Count)
 ```python
 from django.db.models import Count
 
 def home(request):
-    # Count total products
+    # মোট products গণনা করা
     product = Product.objects.aggregate(Count('price'))
     return HttpResponse(product['price__count'])
 ```
 
-### Multiple Aggregations
+### একাধিক Aggregations
 ```python
 from django.db.models import Avg, Max, Min, Sum, Count
 
 def home(request):
-    # Perform multiple aggregations at once
+    # একসাথে একাধিক aggregations করা
     product = Product.objects.aggregate(
         product_avg=Avg('price'),
         product_max=Max('price'),
@@ -579,10 +578,10 @@ def home(request):
     return JsonResponse(product)
 ```
 
-### Aggregation with Filtering
+### Filtering সহ Aggregation
 ```python
 def home(request):
-    # Aggregate filtered records
+    # ফিল্টার করা রেকর্ডের aggregate
     result = Product.objects.filter(
         price__gt=100
     ).aggregate(
@@ -592,10 +591,10 @@ def home(request):
     return JsonResponse(result)
 ```
 
-### Group By with Aggregation (annotate)
+### Aggregation সহ Group By (annotate)
 ```python
 def home(request):
-    # Group by category and calculate aggregates
+    # Category অনুযায়ী group করে aggregates হিসাব করা
     result = Product.objects.values('category__name').annotate(
         total_products=Count('id'),
         avg_price=Avg('price'),
@@ -610,62 +609,62 @@ def home(request):
 
 ## 10. Comparison Operator Queries
 
-Comparison operators allow you to filter records based on numeric or date comparisons.
+Comparison operators আপনাকে numeric বা date comparisons এর ভিত্তিতে রেকর্ড ফিল্টার করতে দেয়।
 
-### Equal (exact)
+### সমান (exact)
 ```python
 def home(request):
-    # Find products with exact price
+    # নির্দিষ্ট মূল্যের products খুঁজে বের করা
     product = Product.objects.filter(price=500).values()
     return JsonResponse({'data': list(product)})
 ```
 
-### Less Than (lt)
+### এর চেয়ে কম (lt)
 ```python
 def home(request):
-    # Find products with price less than 500
+    # ৫০০ এর চেয়ে কম মূল্যের products খুঁজে বের করা
     product = Product.objects.filter(price__lt=500).values()
     return JsonResponse({'data': list(product)})
 ```
 
-### Greater Than (gt)
+### এর চেয়ে বেশি (gt)
 ```python
 def home(request):
-    # Find products with price greater than 200
+    # ২০০ এর চেয়ে বেশি মূল্যের products খুঁজে বের করা
     product = Product.objects.filter(price__gt=200).values()
     return JsonResponse({'data': list(product)})
 ```
 
-### Less Than or Equal (lte)
+### এর চেয়ে কম বা সমান (lte)
 ```python
 def home(request):
-    # Find products with price less than or equal to 200
+    # ২০০ এর চেয়ে কম বা সমান মূল্যের products খুঁজে বের করা
     product = Product.objects.filter(price__lte=200).values()
     return JsonResponse({'data': list(product)})
 ```
 
-### Greater Than or Equal (gte)
+### এর চেয়ে বেশি বা সমান (gte)
 ```python
 def home(request):
-    # Find products with price greater than or equal to 200
+    # ২০০ এর চেয়ে বেশি বা সমান মূল্যের products খুঁজে বের করা
     product = Product.objects.filter(price__gte=200).values()
     return JsonResponse({'data': list(product)})
 ```
 
-### Not Equal (exclude)
+### সমান নয় (exclude)
 ```python
 def home(request):
-    # Find products not equal to specific price
+    # নির্দিষ্ট মূল্যের সমান নয় এমন products খুঁজে বের করা
     product = Product.objects.exclude(price=500).values()
     return JsonResponse({'data': list(product)})
 ```
 
-### Using Q Objects with OR
+### OR সহ Q Objects ব্যবহার করা
 ```python
 from django.db.models import Q
 
 def home(request):
-    # Complex OR conditions
+    # জটিল OR শর্ত
     product = Product.objects.filter(
         Q(name="Laptop") |
         Q(price__lt=2000) |
@@ -675,12 +674,12 @@ def home(request):
     return JsonResponse({'data': list(product)})
 ```
 
-### Using Q Objects with AND
+### AND সহ Q Objects ব্যবহার করা
 ```python
 from django.db.models import Q
 
 def home(request):
-    # Complex AND conditions
+    # জটিল AND শর্ত
     product = Product.objects.filter(
         Q(name="Laptop") &
         Q(price__lt=2000) &
@@ -690,10 +689,10 @@ def home(request):
     return JsonResponse({'data': list(product)})
 ```
 
-### Complex Q Object Combinations
+### জটিল Q Object Combinations
 ```python
 def home(request):
-    # Combine AND and OR conditions
+    # AND এবং OR শর্ত একসাথে ব্যবহার করা
     product = Product.objects.filter(
         (Q(price__gte=100) & Q(price__lte=500)) |
         Q(name__icontains='premium')
@@ -702,10 +701,10 @@ def home(request):
     return JsonResponse({'data': list(product)})
 ```
 
-### Negation with Q Objects
+### Q Objects দিয়ে Negation
 ```python
 def home(request):
-    # Use NOT with Q objects
+    # Q objects এর সাথে NOT ব্যবহার করা
     product = Product.objects.filter(
         ~Q(price__lt=100) & Q(name__icontains='laptop')
     ).values()
@@ -717,12 +716,12 @@ def home(request):
 
 ## 11. String Operator Queries
 
-String operators allow you to perform pattern matching and text searches.
+String operators আপনাকে pattern matching এবং text searches করতে দেয়।
 
 ### Contains (Case-Sensitive)
 ```python
 def home(request):
-    # Find products containing "pp" (case-sensitive)
+    # "pp" সম্বলিত products খুঁজে বের করা (case-sensitive)
     product = Product.objects.filter(name__contains="pp").values()
     return JsonResponse({'data': list(product)})
 ```
@@ -730,7 +729,7 @@ def home(request):
 ### iContains (Case-Insensitive)
 ```python
 def home(request):
-    # Find products containing "pp" (case-insensitive)
+    # "pp" সম্বলিত products খুঁজে বের করা (case-insensitive)
     product = Product.objects.filter(name__icontains="pp").values()
     return JsonResponse({'data': list(product)})
 ```
@@ -738,7 +737,7 @@ def home(request):
 ### Starts With
 ```python
 def home(request):
-    # Find products starting with "p"
+    # "p" দিয়ে শুরু হয় এমন products খুঁজে বের করা
     product = Product.objects.filter(name__startswith="p").values()
     return JsonResponse({'data': list(product)})
 ```
@@ -746,7 +745,7 @@ def home(request):
 ### iStarts With (Case-Insensitive)
 ```python
 def home(request):
-    # Find products starting with "p" (case-insensitive)
+    # "p" দিয়ে শুরু হয় এমন products খুঁজে বের করা (case-insensitive)
     product = Product.objects.filter(name__istartswith="p").values()
     return JsonResponse({'data': list(product)})
 ```
@@ -754,7 +753,7 @@ def home(request):
 ### Ends With
 ```python
 def home(request):
-    # Find products ending with "t"
+    # "t" দিয়ে শেষ হয় এমন products খুঁজে বের করা
     product = Product.objects.filter(name__endswith="t").values()
     return JsonResponse({'data': list(product)})
 ```
@@ -762,17 +761,17 @@ def home(request):
 ### iEnds With (Case-Insensitive)
 ```python
 def home(request):
-    # Find products ending with "t" (case-insensitive)
+    # "t" দিয়ে শেষ হয় এমন products খুঁজে বের করা (case-insensitive)
     product = Product.objects.filter(name__iendswith="t").values()
     return JsonResponse({'data': list(product)})
 ```
 
-### String Operators with OR
+### OR সহ String Operators
 ```python
 from django.db.models import Q
 
 def home(request):
-    # Combine string operators with OR
+    # OR দিয়ে string operators একসাথে ব্যবহার করা
     product = Product.objects.filter(
         Q(name__startswith="p") |
         Q(name__endswith="t")
@@ -780,12 +779,12 @@ def home(request):
     return JsonResponse({'data': list(product)})
 ```
 
-### String Operators with AND
+### AND সহ String Operators
 ```python
 from django.db.models import Q
 
 def home(request):
-    # Combine string operators with AND
+    # AND দিয়ে string operators একসাথে ব্যবহার করা
     product = Product.objects.filter(
         Q(name__startswith="p") &
         Q(name__endswith="t")
@@ -793,10 +792,10 @@ def home(request):
     return JsonResponse({'data': list(product)})
 ```
 
-### Exact Match
+### সম্পূর্ণ মিল (Exact Match)
 ```python
 def home(request):
-    # Exact string match
+    # সম্পূর্ণ string মিল
     product = Product.objects.filter(name__exact="Laptop").values()
     return JsonResponse({'data': list(product)})
 ```
@@ -804,7 +803,7 @@ def home(request):
 ### iExact (Case-Insensitive Exact)
 ```python
 def home(request):
-    # Case-insensitive exact match
+    # Case-insensitive সম্পূর্ণ মিল
     product = Product.objects.filter(name__iexact="laptop").values()
     return JsonResponse({'data': list(product)})
 ```
@@ -827,20 +826,20 @@ def home(request):
 
 ---
 
-## 12. Range and Membership Operator Queries
+## 12. Range এবং Membership Operator Queries
 
-### Range Query (Inclusive)
+### Range Query (অন্তর্ভুক্ত)
 ```python
 def home(request):
-    # Find products with price between 10 and 100 (inclusive)
+    # ১০ থেকে ১০০ এর মধ্যে মূল্যের products খুঁজে বের করা (উভয় অন্তর্ভুক্ত)
     product = Product.objects.filter(price__range=(10, 100)).values()
     return JsonResponse({'data': list(product)})
 ```
 
-### Exclude Range
+### Range বাদ দেওয়া
 ```python
 def home(request):
-    # Find products with price NOT between 100 and 400
+    # ১০০ থেকে ৪০০ এর মধ্যে নয় এমন মূল্যের products খুঁজে বের করা
     product = Product.objects.exclude(price__range=(100, 400)).values()
     return JsonResponse({'data': list(product)})
 ```
@@ -848,43 +847,43 @@ def home(request):
 ### IN Operator
 ```python
 def home(request):
-    # Find products with specific prices
+    # নির্দিষ্ট মূল্যের products খুঁজে বের করা
     product = Product.objects.filter(price__in=[100, 200, 300]).values()
     return JsonResponse({'data': list(product)})
 ```
 
-### Exclude IN
+### IN বাদ দেওয়া
 ```python
 def home(request):
-    # Find products excluding specific prices
+    # নির্দিষ্ট মূল্য বাদ দিয়ে products খুঁজে বের করা
     product = Product.objects.exclude(price__in=[100, 200, 300]).values()
     return JsonResponse({'data': list(product)})
 ```
 
-### IN with List of IDs
+### IDs এর তালিকা সহ IN
 ```python
 def home(request):
-    # Find products by list of IDs
+    # IDs এর তালিকা দিয়ে products খুঁজে বের করা
     product_ids = [1, 5, 10, 15, 20]
     products = Product.objects.filter(id__in=product_ids).values()
     return JsonResponse({'data': list(products)})
 ```
 
-### IN with Subquery
+### Subquery সহ IN
 ```python
 def home(request):
-    # Find products in specific categories
+    # নির্দিষ্ট categories এ products খুঁজে বের করা
     category_ids = Category.objects.filter(name__icontains='electronics').values_list('id', flat=True)
     products = Product.objects.filter(category_id__in=category_ids).values()
     return JsonResponse({'data': list(products)})
 ```
 
-### Date Range Query
+### তারিখের Range Query
 ```python
 from datetime import datetime, timedelta
 
 def home(request):
-    # Find products created in last 7 days
+    # গত ৭ দিনে তৈরি products খুঁজে বের করা
     seven_days_ago = datetime.now() - timedelta(days=7)
     products = Product.objects.filter(
         created_at__range=(seven_days_ago, datetime.now())
@@ -892,12 +891,12 @@ def home(request):
     return JsonResponse({'data': list(products)})
 ```
 
-### Complex Range with Q Objects
+### Q Objects সহ জটিল Range
 ```python
 from django.db.models import Q
 
 def home(request):
-    # Multiple range conditions
+    # একাধিক range শর্ত
     products = Product.objects.filter(
         Q(price__range=(100, 500)) |
         Q(price__range=(1000, 2000))
@@ -907,12 +906,12 @@ def home(request):
 
 ---
 
-## 13. Insert and Delete Operations
+## 13. Insert এবং Delete Operations
 
-### Single Insert with create()
+### create() দিয়ে একক Insert
 ```python
 def home(request):
-    # Create single product
+    # একটি product তৈরি করা
     new_product = Product.objects.create(
         name='OpenAI',
         price=500,
@@ -927,10 +926,10 @@ def home(request):
     })
 ```
 
-### Single Insert with save()
+### save() দিয়ে একক Insert
 ```python
 def home(request):
-    # Create product instance and save
+    # Product instance তৈরি করে save করা
     product = Product(
         name='Google AI',
         price=300,
@@ -949,7 +948,7 @@ def home(request):
 ### Bulk Insert
 ```python
 def home(request):
-    # Prepare list of products
+    # Products এর তালিকা প্রস্তুত করা
     products = [
         Product(name='OpenAI', price=500, unit='per user', img_url='http://example.com/openai.png', category_id=1, user_id=1),
         Product(name='ChatGPT', price=600, unit='per user', img_url='http://example.com/chatgpt.png', category_id=1, user_id=1),
@@ -957,15 +956,15 @@ def home(request):
         Product(name='Midjourney', price=350, unit='per user', img_url='http://example.com/midjourney.png', category_id=1, user_id=1),
     ]
     
-    # Bulk create (much faster for multiple records)
+    # Bulk create (একাধিক রেকর্ডের জন্য অনেক দ্রুত)
     Product.objects.bulk_create(products)
     return JsonResponse({'message': 'Products Uploaded Successfully'})
 ```
 
-### Insert with get_or_create()
+### get_or_create() দিয়ে Insert
 ```python
 def home(request):
-    # Create if not exists
+    # না থাকলে তৈরি করা
     product, created = Product.objects.get_or_create(
         name='Laptop_Pro',
         defaults={
@@ -985,11 +984,11 @@ def home(request):
     return JsonResponse({'message': message, 'id': product.id})
 ```
 
-### Delete Single Record
+### একক রেকর্ড Delete করা
 ```python
 def home(request):
     try:
-        # Get and delete specific product
+        # নির্দিষ্ট product পেয়ে delete করা
         product = Product.objects.get(id=26)
         product.delete()
         return JsonResponse({'message': 'Product Deleted Successfully'})
@@ -997,10 +996,10 @@ def home(request):
         return JsonResponse({'message': 'Product Not Found'}, status=404)
 ```
 
-### Delete Multiple Records
+### একাধিক রেকর্ড Delete করা
 ```python
 def home(request):
-    # Delete all products with price less than 100
+    # ১০০ এর কম মূল্যের সব products delete করা
     deleted_count, _ = Product.objects.filter(price__lt=100).delete()
     return JsonResponse({
         'message': 'Products Deleted Successfully',
@@ -1008,10 +1007,10 @@ def home(request):
     })
 ```
 
-### Delete All Records
+### সব রেকর্ড Delete করা
 ```python
 def home(request):
-    # Delete all products
+    # সব products delete করা
     deleted_count, _ = Product.objects.all().delete()
     return JsonResponse({
         'message': 'All Products Deleted',
@@ -1021,13 +1020,13 @@ def home(request):
 
 ---
 
-## 14. Update and Upsert Operations
+## 14. Update এবং Upsert Operations
 
-### Update Single Record
+### একক রেকর্ড Update করা
 ```python
 def home(request):
     try:
-        # Get and update specific product
+        # নির্দিষ্ট product পেয়ে update করা
         product = Product.objects.get(id=28)
         product.name = "New_Name"
         product.price = 120
@@ -1039,14 +1038,14 @@ def home(request):
         return JsonResponse({'message': 'Product Not Found'}, status=404)
 ```
 
-### Update Multiple Records
+### একাধিক রেকর্ড Update করা
 ```python
 def home(request):
-    # Update all products in a category
+    # একটি category এর সব products update করা
     updated_count = Product.objects.filter(
         category_id=1
     ).update(
-        price=F('price') * 1.1  # Increase price by 10%
+        price=F('price') * 1.1  # মূল্য ১০% বৃদ্ধি করা
     )
     
     return JsonResponse({
@@ -1055,24 +1054,24 @@ def home(request):
     })
 ```
 
-### Update with F() Expression
+### F() Expression দিয়ে Update
 ```python
 from django.db.models import F
 
 def home(request):
-    # Update price using current value
+    # বর্তমান মান ব্যবহার করে মূল্য update করা
     Product.objects.filter(id=10).update(
-        price=F('price') + 50  # Add 50 to current price
+        price=F('price') + 50  # বর্তমান মূল্যে ৫০ যোগ করা
     )
     return JsonResponse({'message': 'Price Updated Successfully'})
 ```
 
-### Conditional Update
+### শর্তসাপেক্ষ Update
 ```python
 from django.db.models import Case, When, Value, IntegerField
 
 def home(request):
-    # Update based on conditions
+    # শর্ত অনুযায়ী update করা
     Product.objects.all().update(
         price=Case(
             When(price__lt=100, then=Value(100)),
@@ -1084,11 +1083,11 @@ def home(request):
     return JsonResponse({'message': 'Prices Normalized'})
 ```
 
-### Upsert (Update or Create)
+### Upsert (Update অথবা Create)
 ```python
 def home(request):
     try:
-        # Update if exists, create if not
+        # আছে তো update, নাহলে create করা
         product, created = Product.objects.update_or_create(
             name="Laptop_New",
             defaults={
@@ -1113,7 +1112,7 @@ def home(request):
 ### Bulk Update
 ```python
 def home(request):
-    # Update multiple records efficiently
+    # একাধিক রেকর্ড দক্ষভাবে update করা
     products = Product.objects.filter(category_id=1)
     
     for product in products:
@@ -1125,12 +1124,12 @@ def home(request):
     return JsonResponse({'message': 'Bulk Update Completed'})
 ```
 
-### Update with select_for_update() (Locking)
+### select_for_update() দিয়ে Update (Locking)
 ```python
 from django.db import transaction
 
 def home(request):
-    # Lock row during update to prevent race conditions
+    # Race conditions প্রতিরোধ করতে update এর সময় row lock করা
     with transaction.atomic():
         product = Product.objects.select_for_update().get(id=10)
         product.price = 500
@@ -1141,24 +1140,24 @@ def home(request):
 
 ---
 
-## 15. Relationship Joins, Reverse and Direct Relationships
+## 15. Relationship Joins, Reverse এবং Direct Relationships
 
-### Understanding Relationships
+### Relationships বোঝা
 
 #### Direct Relationship (Forward)
-When a model has a ForeignKey to another model, you can access the related object directly.
+যখন একটি model এর অন্য model এর সাথে ForeignKey থাকে, তখন আপনি সরাসরি related object access করতে পারেন।
 
 ```python
-# Product has ForeignKey to Category
+# Product এর Category এর সাথে ForeignKey আছে
 product = Product.objects.get(id=1)
-category_name = product.category.name  # Direct access
+category_name = product.category.name  # সরাসরি access
 ```
 
 #### Reverse Relationship (Backward)
-When accessing related objects from the "other side" of the relationship.
+Relationship এর "অন্য দিক" থেকে related objects access করা।
 
 ```python
-# Category to Products (reverse)
+# Category থেকে Products (reverse)
 category = Category.objects.get(id=1)
 products = category.product_set.all()  # Reverse access
 ```
@@ -1166,7 +1165,7 @@ products = category.product_set.all()  # Reverse access
 ### Direct Relationship Query
 ```python
 def home(request):
-    # Access related object (ForeignKey)
+    # Related object access করা (ForeignKey)
     products = Product.objects.select_related('category', 'user').values(
         'id', 'name', 'price',
         'category__name',
@@ -1178,7 +1177,7 @@ def home(request):
 ### Reverse Relationship Query
 ```python
 def home(request):
-    # Access related objects from parent
+    # Parent থেকে related objects access করা
     categories = Category.objects.prefetch_related('product_set').all()
     
     data = []
@@ -1193,15 +1192,15 @@ def home(request):
 
 ### Custom Related Name
 ```python
-# In models.py
+# models.py তে
 class Product(models.Model):
     category = models.ForeignKey(
         Category,
         on_delete=models.CASCADE,
-        related_name='products'  # Custom name instead of product_set
+        related_name='products'  # product_set এর পরিবর্তে custom নাম
     )
 
-# In views.py
+# views.py তে
 def home(request):
     categories = Category.objects.prefetch_related('products').all()
     
@@ -1227,11 +1226,11 @@ class Course(models.Model):
 
 # views.py
 def home(request):
-    # Get student with all courses
+    # সব courses সহ student পাওয়া
     student = Student.objects.prefetch_related('courses').get(id=1)
     courses = student.courses.all()
     
-    # Get course with all students (reverse)
+    # সব students সহ course পাওয়া (reverse)
     course = Course.objects.prefetch_related('students').get(id=1)
     students = course.students.all()
     
@@ -1244,7 +1243,7 @@ def home(request):
 ### Nested Relationships
 ```python
 def home(request):
-    # Access nested relationships
+    # Nested relationships access করা
     products = Product.objects.select_related(
         'category',
         'user__categories'  # Nested relationship
@@ -1260,19 +1259,19 @@ def home(request):
 
 ---
 
-## 16. INNER JOIN and LEFT JOIN Queries
+## 16. INNER JOIN এবং LEFT JOIN Queries
 
-### INNER JOIN with select_related()
+### select_related() দিয়ে INNER JOIN
 ```python
 def home(request):
-    # INNER JOIN: Only products with category
+    # INNER JOIN: শুধু category সহ products
     user = User.objects.filter().select_related('categories').values(
         'id', 'username',
         'categories__id',
         'categories__name'
     )
     
-    # Get SQL query
+    # SQL query পাওয়া
     query = str(user.query)
     
     return JsonResponse({
@@ -1281,7 +1280,7 @@ def home(request):
     })
 ```
 
-### SQL Generated by select_related():
+### select_related() দ্বারা উৎপন্ন SQL:
 ```sql
 SELECT 
     user.id,
@@ -1292,12 +1291,12 @@ FROM myapp_user AS user
 INNER JOIN myapp_category AS categories ON (user.categories_id = categories.id)
 ```
 
-### LEFT JOIN with Annotations
+### Annotations দিয়ে LEFT JOIN
 ```python
 from django.db.models import Count, OuterRef, Subquery
 
 def home(request):
-    # LEFT JOIN: All categories, even without products
+    # LEFT JOIN: সব categories, products ছাড়াও
     categories = Category.objects.annotate(
         product_count=Count('product')
     ).values('id', 'name', 'product_count')
@@ -1305,10 +1304,10 @@ def home(request):
     return JsonResponse({'data': list(categories)})
 ```
 
-### Multiple JOINs
+### একাধিক JOINs
 ```python
 def home(request):
-    # Multiple INNER JOINs
+    # একাধিক INNER JOINs
     products = Product.objects.select_related(
         'category',
         'user',
@@ -1327,10 +1326,10 @@ def home(request):
     })
 ```
 
-### LEFT JOIN with prefetch_related()
+### prefetch_related() দিয়ে LEFT JOIN
 ```python
 def home(request):
-    # LEFT JOIN for reverse relationships
+    # Reverse relationships এর জন্য LEFT JOIN
     category = Category.objects.prefetch_related('product_set').values(
         'name',
         'product__id',
@@ -1344,10 +1343,10 @@ def home(request):
     })
 ```
 
-### Custom JOIN with extra()
+### extra() দিয়ে Custom JOIN
 ```python
 def home(request):
-    # Custom JOIN condition
+    # Custom JOIN শর্ত
     products = Product.objects.extra(
         tables=['myapp_category'],
         where=['myapp_product.category_id = myapp_category.id AND myapp_category.name = %s'],
@@ -1362,7 +1361,7 @@ def home(request):
 from django.db.models import OuterRef, Exists
 
 def home(request):
-    # Get categories that have products
+    # যে categories এ products আছে সেগুলি পাওয়া
     has_products = Product.objects.filter(category_id=OuterRef('id'))
     
     categories = Category.objects.annotate(
@@ -1372,41 +1371,41 @@ def home(request):
     return JsonResponse({'data': list(categories)})
 ```
 
-### Performance: select_related vs prefetch_related
+### Performance: select_related বনাম prefetch_related
 
 #### select_related (INNER JOIN)
-- Use for ForeignKey and OneToOne relationships
-- Creates SQL JOIN
-- Single database query
-- More efficient for small related sets
+- ForeignKey এবং OneToOne relationships এর জন্য ব্যবহার করুন
+- SQL JOIN তৈরি করে
+- একটি database query
+- ছোট related sets এর জন্য বেশি দক্ষ
 
 ```python
-# One query with JOIN
+# JOIN সহ একটি query
 products = Product.objects.select_related('category').all()
 for product in products:
-    print(product.category.name)  # No additional query
+    print(product.category.name)  # কোন অতিরিক্ত query নেই
 ```
 
-#### prefetch_related (Separate queries)
-- Use for ManyToMany and reverse ForeignKey relationships
-- Creates separate queries and joins in Python
-- Multiple database queries
-- More efficient for large related sets
+#### prefetch_related (আলাদা queries)
+- ManyToMany এবং reverse ForeignKey relationships এর জন্য ব্যবহার করুন
+- আলাদা queries তৈরি করে এবং Python এ join করে
+- একাধিক database queries
+- বড় related sets এর জন্য বেশি দক্ষ
 
 ```python
-# Two queries: one for categories, one for products
+# দুটি queries: একটি categories এর জন্য, একটি products এর জন্য
 categories = Category.objects.prefetch_related('product_set').all()
 for category in categories:
-    for product in category.product_set.all():  # No additional query per product
+    for product in category.product_set.all():  # প্রতিটি product এর জন্য অতিরিক্ত query নেই
         print(product.name)
 ```
 
-### Complex JOIN Example
+### জটিল JOIN উদাহরণ
 ```python
 from django.db.models import Prefetch
 
 def home(request):
-    # Complex prefetch with filtering
+    # Filtering সহ জটিল prefetch
     expensive_products = Product.objects.filter(price__gt=500)
     
     categories = Category.objects.prefetch_related(
@@ -1425,125 +1424,125 @@ def home(request):
 
 ---
 
-## Best Practices
+## সর্বোত্তম অভ্যাস (Best Practices)
 
-### 1. Use select_related and prefetch_related
-Avoid N+1 query problems by using these methods appropriately.
+### ১. select_related এবং prefetch_related ব্যবহার করুন
+N+1 query সমস্যা এড়াতে এই methods যথাযথভাবে ব্যবহার করুন।
 
-### 2. Use values() and values_list() for Large Datasets
-When you don't need full model instances, use these methods to reduce memory usage.
+### ২. বড় Datasets এর জন্য values() এবং values_list() ব্যবহার করুন
+যখন আপনার পূর্ণ model instances এর প্রয়োজন নেই, তখন memory ব্যবহার কমাতে এই methods ব্যবহার করুন।
 
-### 3. Use exists() Instead of count()
-When checking if records exist:
+### ৩. count() এর পরিবর্তে exists() ব্যবহার করুন
+রেকর্ড আছে কিনা চেক করার সময়:
 ```python
-# Bad
+# খারাপ
 if Product.objects.filter(name='Laptop').count() > 0:
     pass
 
-# Good
+# ভালো
 if Product.objects.filter(name='Laptop').exists():
     pass
 ```
 
-### 4. Use iterator() for Large QuerySets
+### ৪. বড় QuerySets এর জন্য iterator() ব্যবহার করুন
 ```python
 for product in Product.objects.all().iterator():
-    # Process product
+    # product প্রসেস করুন
     pass
 ```
 
-### 5. Use bulk_create and bulk_update
-For multiple records, always use bulk operations.
+### ৫. bulk_create এবং bulk_update ব্যবহার করুন
+একাধিক রেকর্ডের জন্য, সবসময় bulk operations ব্যবহার করুন।
 
-### 6. Use F() for Database-Level Operations
+### ৬. Database-Level Operations এর জন্য F() ব্যবহার করুন
 ```python
-# Update in database, not Python
+# Database এ update করুন, Python এ নয়
 Product.objects.filter(id=1).update(price=F('price') * 1.1)
 ```
 
-### 7. Use Q Objects for Complex Queries
-Combine multiple conditions cleanly with Q objects.
+### ৭. জটিল Queries এর জন্য Q Objects ব্যবহার করুন
+Q objects দিয়ে একাধিক শর্ত পরিষ্কারভাবে একত্রিত করুন।
 
-### 8. Index Foreign Keys and Frequently Queried Fields
+### ৮. Foreign Keys এবং ঘন ঘন Query করা Fields Index করুন
 ```python
 class Product(models.Model):
     name = models.CharField(max_length=200, db_index=True)
 ```
 
-### 9. Use only() and defer() to Limit Fields
+### ৯. Fields সীমিত করতে only() এবং defer() ব্যবহার করুন
 ```python
-# Load only specific fields
+# শুধুমাত্র নির্দিষ্ট fields load করুন
 products = Product.objects.only('name', 'price')
 
-# Load all except specific fields
+# নির্দিষ্ট fields বাদে সব load করুন
 products = Product.objects.defer('description', 'img_url')
 ```
 
-### 10. Monitor Query Performance
-Use Django Debug Toolbar and database query logs to identify slow queries.
+### ১০. Query Performance নিরীক্ষণ করুন
+ধীর queries চিহ্নিত করতে Django Debug Toolbar এবং database query logs ব্যবহার করুন।
 
 ---
 
-## Common Pitfalls
+## সাধারণ ভুল (Common Pitfalls)
 
-### 1. N+1 Query Problem
+### ১. N+1 Query সমস্যা
 ```python
-# Bad - Creates N+1 queries
+# খারাপ - N+1 queries তৈরি করে
 products = Product.objects.all()
 for product in products:
-    print(product.category.name)  # Additional query per product
+    print(product.category.name)  # প্রতিটি product এর জন্য অতিরিক্ত query
 
-# Good - Single query with JOIN
+# ভালো - JOIN সহ একটি query
 products = Product.objects.select_related('category').all()
 for product in products:
     print(product.category.name)
 ```
 
-### 2. Avoiding get() Exceptions
+### ২. get() Exceptions এড়ানো
 ```python
-# Bad - Can raise exception
+# খারাপ - Exception raise করতে পারে
 product = Product.objects.get(id=999)
 
-# Good - Use try-except or filter().first()
+# ভালো - try-except বা filter().first() ব্যবহার করুন
 try:
     product = Product.objects.get(id=999)
 except Product.DoesNotExist:
     product = None
 
-# Or
+# অথবা
 product = Product.objects.filter(id=999).first()
 ```
 
-### 3. Using count() When Not Needed
+### ৩. প্রয়োজন না হলে count() ব্যবহার করা
 ```python
-# Bad - Executes query twice
+# খারাপ - দুইবার query execute করে
 if Product.objects.filter(price__gt=100).count() > 0:
     products = Product.objects.filter(price__gt=100)
 
-# Good - Execute once
+# ভালো - একবার execute করুন
 products = Product.objects.filter(price__gt=100)
 if products.exists():
-    # Use products
+    # products ব্যবহার করুন
 ```
 
 ---
 
-## Conclusion
+## উপসংহার
 
-Django ORM provides a powerful, Pythonic way to interact with databases. By mastering these patterns and following best practices, you can write efficient, maintainable database queries without writing raw SQL.
+Django ORM databases এর সাথে interact করার একটি শক্তিশালী, Pythonic উপায় প্রদান করে। এই patterns আয়ত্ত করে এবং best practices অনুসরণ করে, আপনি raw SQL না লিখেই দক্ষ, maintainable database queries লিখতে পারবেন।
 
-### Key Takeaways:
-- Use QuerySet methods for cleaner code
-- Leverage select_related and prefetch_related for performance
-- Understand when to use aggregation, annotation, and filtering
-- Monitor query performance and optimize when needed
-- Follow Django conventions for better maintainability
+### মূল বিষয়সমূহ:
+- পরিষ্কার কোডের জন্য QuerySet methods ব্যবহার করুন
+- Performance এর জন্য select_related এবং prefetch_related লাভজনক
+- কখন aggregation, annotation, এবং filtering ব্যবহার করতে হয় তা বুঝুন
+- Query performance নিরীক্ষণ করুন এবং প্রয়োজন হলে optimize করুন
+- ভালো maintainability এর জন্য Django conventions অনুসরণ করুন
 
-### Further Learning:
+### আরও শেখার জন্য:
 - Django Official Documentation: https://docs.djangoproject.com/en/stable/topics/db/queries/
 - Django ORM Cookbook: https://books.agiliq.com/projects/django-orm-cookbook/
 - Django Debug Toolbar: https://django-debug-toolbar.readthedocs.io/
 
 ---
-**Created with ❤️ for Django Developers**
 
+**Django Developers দের জন্য ❤️ সহকারে তৈরি**
